@@ -7,12 +7,15 @@ Created on Mon Sep  9 07:07:09 2019
 
 # https://spoonacular.com/food-api/docs
 
+import math
 ## https://www.dataquest.io/blog/web-scraping-tutorial-python/
 user_name ="khushal" #str(input('Enter the User name := '))    
 user_gender = "male" #str(input('Enter Your gender details (MALE/FEMALE) := '))    
 user_age = 27 # int(input('Please enter your Age in number := '))
 height = 1.94 #float(input('Please enter your height input meters(decimals) := '))
 weight = 109 #int(input('Please enter your weight input kg := '))
+expected_weight_loss = 10 #int(input('Please enter your epected weight which you want to loose input kg := '))
+
 meal_preference = "non-vegetarian" #str(input('Enter your meal preference (vegetarian/non-vegetarian/eggetarian) := '))    
 diabetic_flag = "no" #str(input("Are you diabetic (YES/NO) := "))
 print(                           '1. Very Light = Typical Office job (sitting,studying,little walking throughout the day) \n',
@@ -20,7 +23,7 @@ print(                           '1. Very Light = Typical Office job (sitting,st
                                  '3. Moderate = Jobs requiring physical activity (landscaping,cleaning,maintaince,jogging,biking/working out 2hrs/day) \n',
                                  '4. Heavy = Heavy manual labor (construction,dancer,athlete,hard physical activity min 4 hrs/day) \n',
                                  '5. Very Heavy = Moderate to hard physical activity min 8 hrs/day \n')
-daily_activity_level = 'moderate' # str(input('Enter your Daily activity := \n'))
+daily_activity_level = 3 # int(input('Enter your Daily activity (options given in digit) := \n'))
 
 def bmi_calculator(height,weight):
     bmi = round((weight/(height**2)),2)
@@ -53,7 +56,8 @@ def calculate_body_fat_percentage (bmi,age,gender):
     else: 
         print('There is an error with your input')
         print('Please check you have entered whole numbers\n'
-              'and decimals were asked.')    
+              'and decimals were asked.')   
+    print("Body_Fat_Percentage = ",Body_Fat_Percentage)
     return Body_Fat_Percentage,body_fat_flag
 
 def set_body_fat_flag(Body_Fat_Percentage,age,gender):
@@ -139,15 +143,15 @@ def create_dict_from_variables(user_name, user_gender,height,weight,bmi,bmi_flag
             'diabetic_flag':diabetic_flag}
 
 def calculate_your_daily_calorie_needs(weight,gender,Body_Fat_Percentage,daily_activity_level):
-    if daily_activity_level.lower() == 'very light':
+    if daily_activity_level == 1:
         activity_level = 1.3
-    elif daily_activity_level.lower() == 'light':
+    elif daily_activity_level == 2:
         activity_level = 1.55
-    elif daily_activity_level.lower() == 'moderate':
+    elif daily_activity_level == 3:
         activity_level = 1.65
-    elif daily_activity_level.lower() == 'heavy':
+    elif daily_activity_level == 4:
         activity_level = 1.80
-    elif daily_activity_level.lower() == 'very heavy':
+    elif daily_activity_level == 5:
         activity_level = 2.00
     else:
         print("Kindly check the entered input")
@@ -162,7 +166,7 @@ def calculate_your_daily_calorie_needs(weight,gender,Body_Fat_Percentage,daily_a
         else:
             lean_factor = 0.85
             
-        Basal_Metabolic_Rate = (weight *0.9) * 24 * lean_factor
+        Basal_Metabolic_Rate = round (((weight *0.9) * 24 * lean_factor ),2)
         
     elif gender.lower() == 'male':
         
@@ -174,20 +178,45 @@ def calculate_your_daily_calorie_needs(weight,gender,Body_Fat_Percentage,daily_a
             lean_factor = 0.90
         else:
             lean_factor = 0.85        
-        Basal_Metabolic_Rate = (weight* 1.0) * 24 * lean_factor
+        Basal_Metabolic_Rate = round (((weight* 1.0) * 24 * lean_factor ),2)
 
     else: 
         print('There is an error with your input')
         print('Please check you have entered whole numbers\n'
-              'and decimals were asked.')   
-    
+              'and decimals were asked.') 
+        
+    print("Basal_Metabolic_Rate", Basal_Metabolic_Rate)
     daily_calorie_need = round((Basal_Metabolic_Rate * activity_level),2)
     print("daily_calorie_need = ",daily_calorie_need)
+    print('*'*25)
     return daily_calorie_need
 
+
+def calculate_ideal_body_weight(gender,height):
+    height_in_cm = height * 100
+    if gender.lower() == 'female':
+        ideal_body_weight =  (height_in_cm -100) + ((height_in_cm -100) * 0.15)
+    elif gender.lower() == 'male':
+       ideal_body_weight =  (height_in_cm -100) - ((height_in_cm -100) * 0.1)
+    else:
+        print('There is an error with your input')
+        print('Please check you have entered whole numbers\n'
+              'and decimals were asked.') 
+    print("ideal_body_weight = ",ideal_body_weight)
+    return ideal_body_weight
+
+ideal_body_weight = calculate_ideal_body_weight(user_gender,height)
 bmi,bmi_flag = bmi_calculator(height,weight)
 Body_Fat_Percentage,body_fat_flag = calculate_body_fat_percentage (bmi,user_age,user_gender)
 daily_calorie_need = calculate_your_daily_calorie_needs(weight,user_gender,Body_Fat_Percentage,daily_activity_level)
+
+expected_weight = math.ceil((weight + ideal_body_weight) /2)
+
+print("expected_weight = ",expected_weight)
+expected_daily_activity_level = daily_activity_level 
+expected_bmi,expected_bmi_flag = bmi_calculator(height,expected_weight)
+expected_Body_Fat_Percentage,expected_body_fat_flag = calculate_body_fat_percentage (expected_bmi,user_age,user_gender)
+expected_daily_calorie_need = calculate_your_daily_calorie_needs(expected_weight,user_gender,expected_Body_Fat_Percentage,expected_daily_activity_level)
 
 user_info_dict = create_dict_from_variables(user_name.lower(),user_gender.lower(),height,weight,
                                             bmi,bmi_flag.lower(),Body_Fat_Percentage,body_fat_flag.lower(),
